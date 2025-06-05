@@ -1,6 +1,6 @@
 # SEE
 spectral edge encoding
-**Data Preprocessing**
+**Data Preprocessing**.  
 
 Place the following three scripts in the `data/moleculenet_data/` directory:
 
