@@ -52,6 +52,7 @@ parser.add_argument("--SCALE_MIN", type=float, default=0.8)
 parser.add_argument("--SCALE_MAX", type=float, default=2.0)
 parser.add_argument("--device", type=str, default="cuda")
 parser.add_argument("--VERBOSE", type=bool, default=True)
+args = parser.parse_args()
 
 # 초기 CONFIG 설정 (기본값은 argparse에서 받아온 값으로 덮어씌워짐)
 CONFIG = {
