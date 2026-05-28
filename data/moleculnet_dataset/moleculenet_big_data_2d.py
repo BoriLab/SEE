@@ -8,15 +8,22 @@ MoleculeNet → Pickle 변환 스크립트
  - 압축          : 사용하지 않음 (pickle protocol 5)
 """
 
-import os, random, pickle, numpy as np, torch
+import os
+import random
+import pickle
+import numpy as np
+import torch
+# import pandas as pd
 from torch_geometric.datasets import MoleculeNet
 from rdkit import Chem
 from rdkit.Chem import AllChem
 import scipy.sparse as sp
+from scipy.linalg import eigh
 
 # --------------------------------------------------------------------------- #
-# 1. 시드 고정
+# 시드 고정
 # --------------------------------------------------------------------------- #
+
 def set_seed(seed: int = 42):
     os.environ["PYTHONHASHSEED"] = str(seed)
     os.environ["CUBLAS_WORKSPACE_CONFIG"] = ":16:8"
@@ -28,8 +35,9 @@ def set_seed(seed: int = 42):
     torch.use_deterministic_algorithms(True)
 
 # --------------------------------------------------------------------------- #
-# 2. 2D 좌표
+# 2D 좌표
 # --------------------------------------------------------------------------- #
+
 def get_2d_coordinates(smiles: str):
     mol = Chem.MolFromSmiles(smiles)
     if mol is None: return None
@@ -40,8 +48,9 @@ def get_2d_coordinates(smiles: str):
                     dtype=np.float32)
 
 # --------------------------------------------------------------------------- #
-# 3. Spectral Edge Encoding
+# Spectral Edge Encoding
 # --------------------------------------------------------------------------- #
+
 def spectral_edge_encoding(coords: np.ndarray, k_eigen=8, gamma=0.5):
     n = coords.shape[0]
     A = np.zeros((n, n), dtype=np.int8)
@@ -69,8 +78,9 @@ def spectral_edge_encoding(coords: np.ndarray, k_eigen=8, gamma=0.5):
             np.asarray(edge_attr,  dtype=np.float16))
 
 # --------------------------------------------------------------------------- #
-# 4. 희소 adjacency (CSR, float32)
+# sparse adjacency (CSR, float32)
 # --------------------------------------------------------------------------- #
+
 def make_sparse_adjacency(coords: np.ndarray, thresh=None):
     n = coords.shape[0];  row, col, dist = [], [], []
     for i in range(n):
@@ -84,8 +94,9 @@ def make_sparse_adjacency(coords: np.ndarray, thresh=None):
                          dtype=np.float32)
 
 # --------------------------------------------------------------------------- #
-# 5. 메인 전처리
+# 메인 전처리
 # --------------------------------------------------------------------------- #
+
 def load_and_save_moleculenet_dataset(dataset_name: str,
                                       root: str,
                                       pkl_path: str,
@@ -126,8 +137,9 @@ def load_and_save_moleculenet_dataset(dataset_name: str,
     return data_dict
 
 # --------------------------------------------------------------------------- #
-# 6. 실행 예시
+#  실행
 # --------------------------------------------------------------------------- #
+
 if __name__ == "__main__":
     base_root = "/root/2025/dataset"
     out_dir   = "/root/2025/sse_moleculenet/data/moleculenet_dataset/data_pkl"
